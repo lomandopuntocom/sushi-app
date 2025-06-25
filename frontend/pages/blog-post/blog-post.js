@@ -1,4 +1,6 @@
 // blog-post.js
+import { fakePosts } from "../../mockdata/fakePostsData.js"; // Import the fake data
+
 export class BlogPost extends HTMLElement {
     constructor() {
         super();
@@ -6,33 +8,24 @@ export class BlogPost extends HTMLElement {
 
         const template = document.createElement('template');
         template.innerHTML = `
-            <link rel="stylesheet" href="styles.css"> <div class="blog-post-container">
+            <link rel="stylesheet" href="styles.css">
+            <div class="blog-post-container">
                 <div class="left-section">
-                    <img src="img/blog-post-main.png" alt="Manos de chef cortando salmón">
+                    <img id="main-post-image" src="img/blog-post-main.png" alt="Manos de chef cortando salmón">
                     <div class="overlay-content">
                         </div>
                 </div>
                 <div class="right-section">
                     <div class="article-meta">
-                        <span class="date">24TH AUG 2023</span>
+                        <span class="date" id="post-date"></span>
                     </div>
-                    <h1 class="article-title">HOW QITCHEN REDEFINES<br>FLAVOR HARMONY IN<br>EVERY BITE</h1>
+                    <h1 class="article-title" id="post-title"></h1>
 
-                    <div class="article-content">
-                        <h2 class="section-title">UNVEILING CULINARY ARTISTRY: A JOURNEY INTO QITCHEN'S SOUL</h2>
-                        <p>In a world where dining experiences often blend into the ordinary, Qitchen stands as an emblem of culinary passion redefined. Beyond being a restaurant that serves sushi, Qitchen is an embodiment of dedication, creativity, and a profound love for the culinary gastronomy. As you step through its doors, you are not merely entering a dining place; you are being ushered into an experience that goes beyond the boundaries of any traditional dining encounter.</p>
-
-                        <h2 class="section-title">CRAFTING A FEAST FOR THE SENSES</h2>
-                        <p>The heart of Qitchen's allure lies in its meticulous attention to every detail, from the selection of ingredients to the presentation of each dish. What is renowned for its exceptional sushi, Qitchen's passion for perfection extends to every facet of its culinary journey. The talented chefs create a symphony of flavors, meticulously blending textures and aromas to create a multisensory masterpiece.</p>
-                        <p>The restaurant itself speaks of a story where modern elegance meets warm, inviting ambiance to relish not only the food but also the atmosphere that envelops them. Each dish that graces the table is not just a meal; it's a tale told through taste – a testament to the tireless commitment Qitchen has toward crafting an experience for restaurant’s food mastery and devotion to it.</p>
-
-                        <h2 class="section-title">BEYOND SUSHI: NURTURING CONNECTIONS</h2>
-                        <p>While the gastronomic delights are undoubtedly the centerpiece, Qitchen goes beyond to create a culinary haven. It's a place that fosters conversations, where connections flow as smoothly as the sakes, and memories turn into cherished moments. The passionate team at Qitchen believes that dining is an act of bonding – a chance to share joy, laughter, and stories over a beautifully laid table.</p>
-                        <p>The Qitchen experience transcends the physical walls of the restaurant. It's an invitation to delve into the culinary art and into a world where passion for food is an art, and every plate is a cherished canvas. Through the symphony of flavors, the artistry of presentation, and the warmth of connection, Qitchen invites you to witness passion personified in every aspect of your dining journey.</p>
-
-                        <div class="author-info">
-                            <span class="author-label">Author:</span> <span class="author-name">Name</span>
+                    <div class="article-content" id="post-content">
                         </div>
+
+                    <div class="author-info">
+                        <span class="author-label">Author:</span> <span class="author-name" id="post-author"></span>
                     </div>
 
                     <div class="footer-links">
@@ -44,15 +37,61 @@ export class BlogPost extends HTMLElement {
         `;
 
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+
+        // Get references to the elements that will display dynamic content
+        this.postTitleElement = this.shadowRoot.getElementById('post-title');
+        this.postDateElement = this.shadowRoot.getElementById('post-date');
+        this.postContentElement = this.shadowRoot.getElementById('post-content');
+        this.postAuthorElement = this.shadowRoot.getElementById('post-author');
+        this.mainPostImageElement = this.shadowRoot.getElementById('main-post-image');
     }
 
     connectedCallback() {
         console.log('Blog Post component added to the DOM');
-        // Asegúrate de que todas las imágenes referenciadas existan en tus assets
+        this.loadBlogPost();
     }
 
     disconnectedCallback() {
         console.log('Blog Post component removed from the DOM');
+    }
+
+    async loadBlogPost() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const postId = urlParams.get('id');
+
+        if (!postId) {
+            console.error('No post ID found in URL parameters.');
+            this.postTitleElement.textContent = 'Error: Post not found';
+            this.postContentElement.innerHTML = '<p>Please select a blog post from the main blog page.</p>';
+            return;
+        }
+
+        // Find the post from the imported fakePosts data
+        const post = fakePosts.find(p => p.Id === parseInt(postId));
+
+        if (post) {
+            this.postTitleElement.textContent = post.Nombre;
+            this.postDateElement.textContent = new Date(post.Fecha).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }).toUpperCase();
+
+            // Handle plain text content: split by newlines to create paragraphs
+            const paragraphs = post.Contenido.split('\n').filter(p => p.trim() !== ''); // Filter out empty lines
+            this.postContentElement.innerHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
+
+            this.postAuthorElement.textContent = post.Autor;
+            this.mainPostImageElement.src = post.ImageUrl;
+            this.mainPostImageElement.alt = post.AltText;
+        } else {
+            this.postTitleElement.textContent = 'Post not found';
+            this.postContentElement.innerHTML = '<p>The requested blog post could not be found.</p>';
+            this.postAuthorElement.textContent = 'N/A';
+            this.postDateElement.textContent = '';
+            this.mainPostImageElement.src = 'https://placehold.co/1200x800/eeeeee/000000?text=Post+Not+Found';
+            this.mainPostImageElement.alt = 'Placeholder image for not found post.';
+        }
     }
 }
 

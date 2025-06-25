@@ -1,8 +1,8 @@
-const prisma = require('../prisma/client.js')
+const prisma = require('@prisma/client')
 
 const bcrypt = require('bcryptjs');
 
-const registrarUsuario = async (req, res) => {
+export const registrarUsuario = async (req, res) => {
     const { nombre, email, password } = req.body;
 
     const salt = await bcrypt.genSalt(10);
@@ -26,6 +26,5 @@ const registrarUsuario = async (req, res) => {
     });
 };
 
-module.exports = {
-    registrarUsuario,
-};
+//module.exports = {
+    //registrarUsuario,};

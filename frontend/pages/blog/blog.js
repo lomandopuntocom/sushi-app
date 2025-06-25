@@ -1,4 +1,6 @@
 // blog.js
+import { fakePosts } from "../../mockdata/fakePostsData.js"; // Import the fake data
+
 export class Blog extends HTMLElement {
     constructor() {
         super();
@@ -6,7 +8,8 @@ export class Blog extends HTMLElement {
 
         const template = document.createElement('template');
         template.innerHTML = `
-            <link rel="stylesheet" href="styles.css"> <div class="blog-container">
+            <link rel="stylesheet" href="styles.css">
+            <div class="blog-container">
                 <div class="left-section">
                     <img src="img/blog-main.png" alt="Personas fotografiando platos de comida">
                     <div class="overlay-content">
@@ -20,42 +23,7 @@ export class Blog extends HTMLElement {
                     </div>
 
                     <div class="articles-list">
-                        <div class="blog-article">
-                            <img src="img/post.png" alt="Manos cortando salmón">
-                            <div class="article-content">
-                                <h3>CULINARY CRAFTSMANSHIP</h3>
-                                <p>Delve into the precise techniques behind our signature sushi creations.</p>
-                            </div>
                         </div>
-                        <div class="blog-article">
-                            <img src="img/post.png" alt="Mano sosteniendo un teléfono con un plato">
-                            <div class="article-content">
-                                <h3>THE ART OF FOOD PHOTOGRAPHY</h3>
-                                <p>Tips and tricks for capturing mouth-watering images of your dishes.</p>
-                            </div>
-                        </div>
-                        <div class="blog-article">
-                            <img src="img/post.png" alt="Corte de tomate y atún">
-                            <div class="article-content">
-                                <h3>SEASONAL INGREDIENTS SPOTLIGHT</h3>
-                                <p>Discover the freshest produce we're featuring on our menu this month.</p>
-                            </div>
-                        </div>
-                        <div class="blog-article">
-                            <img src="img/post.png" alt="Persona espolvoreando algo sobre un tazón">
-                            <div class="article-content">
-                                <h3>FROM FARM TO TABLE</h3>
-                                <p>Our commitment to sourcing local and sustainable ingredients.</p>
-                            </div>
-                        </div>
-                        <div class="blog-article">
-                            <img src="img/post.png" alt="Manos preparando una ensalada">
-                            <div class="article-content">
-                                <h3>HEALTHY EATING WITH QITCHEN</h3>
-                                <p>Explore our nutritious and delicious options for a balanced diet.</p>
-                            </div>
-                        </div>
-                    </div>
 
                     <div class="footer-links">
                         <a href="#">Licensing</a>
@@ -70,12 +38,44 @@ export class Blog extends HTMLElement {
 
     connectedCallback() {
         console.log('Blog component added to the DOM');
-        // Asegúrate de que todas las imágenes referenciadas existan en tus assets
+        this.loadBlogPosts();
     }
 
     disconnectedCallback() {
         console.log('Blog component removed from the DOM');
     }
+
+    async loadBlogPosts() {
+        const articlesList = this.shadowRoot.querySelector('.articles-list');
+        articlesList.innerHTML = ''; // Clear existing static content
+
+        // Use the imported fakePosts data
+        fakePosts.forEach(post => {
+            const articleDiv = document.createElement('div');
+            articleDiv.classList.add('blog-article');
+            articleDiv.dataset.postId = post.Id; // Store post ID for potential future use
+
+            // Create a truncated summary for the list view
+            const summary = post.Contenido.substring(0, 150) + (post.Contenido.length > 150 ? '...' : '');
+
+            articleDiv.innerHTML = `
+                <img src="${post.ImageUrl}" alt="${post.AltText}">
+                <div class="article-content">
+                    <h3>${post.Nombre}</h3>
+                    <p>${summary}</p>
+                    <span class="article-meta">By ${post.Autor} on ${new Date(post.Fecha).toLocaleDateString()}</span>
+                </div>
+            `;
+
+            articleDiv.addEventListener('click', () => {
+                // Redirect to /blog-post when the article is clicked
+                window.location.href = `/blog-post?id=${post.Id}`; // Pass ID as query parameter
+            });
+
+            articlesList.appendChild(articleDiv);
+        });
+    }
 }
 
 customElements.define('blog-component', Blog);
+

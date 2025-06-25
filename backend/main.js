@@ -1,7 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-import usuarioRoutes from'../routes/usuarioRoutes';
+const usuarioRoutes = require('./routes/usuarioRoutes');
 
 dotenv.config();
 

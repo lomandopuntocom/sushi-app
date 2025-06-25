@@ -10,8 +10,10 @@ export class menu extends HTMLElement {
 
         const template = document.createElement('template');
         template.innerHTML = `
-            <link rel="stylesheet" href="./styles.css"> <div class="menu-container">
-                <div class="menu-image-section" style="background-image: url(img/menu.png);"> <div class="image-overlay">
+            <link rel="stylesheet" href="./styles.css">
+            <div class="menu-container">
+                <div class="menu-image-section" style="background-image: url(img/menu.png);">
+                    <div class="image-overlay">
                         <h3 id="menu-title">MENU</h3>
                         <p id="dish-description" class="menu-description-text"></p>
                     </div>
@@ -66,7 +68,7 @@ export class menu extends HTMLElement {
         this.menuTitleElement.textContent = 'MENU';
         this.dishDescriptionElement.textContent = '';
         this.dishDescriptionElement.style.opacity = '0';
-        this.menuImageSection.style.backgroundImage = 'url(img/main.png)'; // Ruta actualizada
+        this.menuImageSection.style.backgroundImage = 'url(img/menu.png)'; // Corrected to use 'menu.png' from the template
 
         if (categoryId === 'all') {
             const actualCategories = this.menuData.categorias.filter(cat => cat.id !== 'all');
@@ -93,7 +95,6 @@ export class menu extends HTMLElement {
             const categoryDishes = this.menuData.platillos.filter(dish => dish.idCategoria === categoryId);
 
             if (selectedCategory && categoryDishes.length > 0) {
-
                 const dishList = document.createElement('ul');
                 dishList.classList.add('menu-list');
 
@@ -130,7 +131,7 @@ export class menu extends HTMLElement {
 
         const addToCartButton = listItem.querySelector('.add-to-cart-button');
         addToCartButton.addEventListener('click', (event) => {
-            event.stopPropagation();
+            event.stopPropagation(); // Prevent listItem's click event from firing
             this.handleAddToCart(dish);
         });
 
@@ -158,13 +159,13 @@ export class menu extends HTMLElement {
 
     handleAddToCart(dish) {
         console.log(`Adding ${dish.nombre} (ID: ${dish.id}, Price: $${dish.precio.toFixed(2)}) to cart.`);
-        // Aquí puedes emitir un evento personalizado para que el componente del carrito lo capture
+        // Emitir un evento personalizado para que el componente del carrito lo capture
         this.dispatchEvent(new CustomEvent('add-to-cart', {
             detail: { dish: dish },
             bubbles: true,   // El evento "burbujea" y puede ser escuchado por padres
             composed: true   // El evento puede atravesar los límites del Shadow DOM
         }));
-        alert(`${dish.nombre} added to cart!`); // Feedback al usuario
+        // alert(`${dish.nombre} added to cart!`); // Feedback al usuario - Considerar algo menos intrusivo en una app real
     }
 
     connectedCallback() {
@@ -173,15 +174,9 @@ export class menu extends HTMLElement {
 
     disconnectedCallback() {
         console.log('Menu component removed from the DOM');
-        // Asegúrate de limpiar los event listeners si es necesario
-        this.shadowRoot.querySelectorAll('.add-to-cart-button').forEach(button => {
-            // No podemos remover el listener específico sin la referencia a la función
-            // Mejor práctica: si la tarjeta se remueve, sus listeners se limpian automáticamente.
-            // Para eventos en el document/window, necesitarías guardarlos.
-        });
-        this.shadowRoot.querySelectorAll('.menu-filter-card').forEach(card => {
-            // Similar al anterior
-        });
+        // No necesitamos limpiar listeners creados en createDishCard porque listItem y sus hijos
+        // son eliminados del DOM cuando renderDishes limpia dishListContainer.
+        // Los listeners en menuFilterList se crean una vez y se limpian si el componente entero se remueve.
     }
 }
 
