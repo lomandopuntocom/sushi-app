@@ -1,0 +1,44 @@
+.first-navbar-body {
+    background-color: black;
+    color: white;
+    margin-left: 20px;
+    margin-top: 20px;
+    height: 50px;
+    position: fixed;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding-left: 20px;
+    padding-right: 20px;
+    z-index: 100;
+}
+.first-navbar-button-burger {
+    background-color: black;
+    border: 1px solid rgb(73, 73, 73);
+    width: 30px;
+    height: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+.first-navbar-button-reservation{
+    background-color: black;
+    border: 1px solid rgb(73, 73, 73);
+    height: 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+}
+
+.first-navbar-logo{
+    text-decoration: none;
+    color: white;
+    font-size:xx-large;
+}
+
+.first-navbar-link{
+    text-decoration: none;
+    color: white;
+}
