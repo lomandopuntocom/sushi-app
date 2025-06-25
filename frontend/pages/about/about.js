@@ -1,6 +1,3 @@
-// Import necessary custom elements if they are used within the About component
-// import { Navbar } from './pages/navbar/Navbar.js'; // Assuming Navbar is a separate component
-
 export class About extends HTMLElement {
     constructor() {
         super();
@@ -68,8 +65,6 @@ export class About extends HTMLElement {
 
     connectedCallback() {
         console.log('About component added to the DOM');
-        // Asegúrate de que las imágenes existan en estas rutas
-        // Si las imágenes están en una carpeta 'img' dentro de 'assets', la ruta sería './assets/img/About.jpg'
     }
 
     disconnectedCallback() {

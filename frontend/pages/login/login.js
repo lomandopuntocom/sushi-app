@@ -55,9 +55,8 @@ export class Login extends HTMLElement {
     }
 
     handleSubmit(event) {
-        event.preventDefault(); // Previene el envío por defecto del formulario
+        event.preventDefault();
 
-        // Obtener valores del formulario
         const email = this.shadowRoot.getElementById('email').value;
         const password = this.shadowRoot.getElementById('password').value;
 
@@ -65,10 +64,7 @@ export class Login extends HTMLElement {
             email, password
         });
 
-        // Aquí iría la lógica para enviar estos datos a un servidor o API para autenticación
         alert('Inicio de sesión simulado! (Valida tus credenciales con el backend)');
-        // Opcionalmente, redirigir después del éxito
-        // Router.go('/dashboard');
     }
 }
 

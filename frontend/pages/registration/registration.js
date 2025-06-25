@@ -67,9 +67,8 @@ export class Registration extends HTMLElement {
     }
 
     handleSubmit(event) {
-        event.preventDefault(); // Previene el envío por defecto del formulario
+        event.preventDefault();
 
-        // Obtener valores del formulario
         const name = this.shadowRoot.getElementById('name').value;
         const phone = this.shadowRoot.getElementById('phone').value;
         const email = this.shadowRoot.getElementById('email').value;
@@ -77,7 +76,6 @@ export class Registration extends HTMLElement {
         const confirmPassword = this.shadowRoot.getElementById('confirm-password').value;
         const address = this.shadowRoot.getElementById('address').value;
 
-        // Simple validación de contraseña (ejemplo)
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
@@ -87,11 +85,7 @@ export class Registration extends HTMLElement {
             name, phone, email, password, address
         });
 
-        // Aquí iría la lógica para enviar estos datos a un servidor o API para el registro
         alert('Registro enviado! (Esto es solo una simulación)');
-        // Opcionalmente, resetear el formulario o redirigir
-        // event.target.reset();
-        // Router.go('/login'); // Redirigir al login
     }
 }
 

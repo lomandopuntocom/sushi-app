@@ -1,6 +1,3 @@
-// blog.js
-import { fakePosts } from "../../mockdata/fakePostsData.js"; // Import the fake data
-
 export class Blog extends HTMLElement {
     constructor() {
         super();
@@ -34,11 +31,24 @@ export class Blog extends HTMLElement {
         `;
 
         this.shadowRoot.appendChild(template.content.cloneNode(true));
+        this.fetchBlogData();
+    }
+
+    async fetchBlogData() {
+        try {
+            const response = await fetch('http://localhost:3000/api/blog');
+            const data = await response.json();
+
+            this.blogData = data.publicaciones;
+            this.loadBlogPosts();
+        } catch (error) {
+            console.error('Error al cargar los datos del menú:', error);
+            this.dishListContainer.innerHTML = '<p>Error al cargar los datos del menú.</p>';
+        }
     }
 
     connectedCallback() {
         console.log('Blog component added to the DOM');
-        this.loadBlogPosts();
     }
 
     disconnectedCallback() {
@@ -47,29 +57,26 @@ export class Blog extends HTMLElement {
 
     async loadBlogPosts() {
         const articlesList = this.shadowRoot.querySelector('.articles-list');
-        articlesList.innerHTML = ''; // Clear existing static content
+        articlesList.innerHTML = '';
 
-        // Use the imported fakePosts data
-        fakePosts.forEach(post => {
+        this.blogData.forEach(post => {
             const articleDiv = document.createElement('div');
             articleDiv.classList.add('blog-article');
-            articleDiv.dataset.postId = post.Id; // Store post ID for potential future use
+            articleDiv.dataset.postId = post.id;
 
-            // Create a truncated summary for the list view
-            const summary = post.Contenido.substring(0, 150) + (post.Contenido.length > 150 ? '...' : '');
+            const summary = post.contenido.substring(0, 150) + (post.contenido.length > 150 ? '...' : '');
 
             articleDiv.innerHTML = `
-                <img src="${post.ImageUrl}" alt="${post.AltText}">
+                <img src="img/blog-post-main.png" alt="Imagen generica">
                 <div class="article-content">
-                    <h3>${post.Nombre}</h3>
+                    <h3>${post.nombre}</h3>
                     <p>${summary}</p>
-                    <span class="article-meta">By ${post.Autor} on ${new Date(post.Fecha).toLocaleDateString()}</span>
+                    <span class="article-meta">By ${post.autor} on ${new Date(post.fecha).toLocaleDateString()}</span>
                 </div>
             `;
 
             articleDiv.addEventListener('click', () => {
-                // Redirect to /blog-post when the article is clicked
-                window.location.href = `/blog-post?id=${post.Id}`; // Pass ID as query parameter
+                window.location.href = `/blog-post?id=${post.id}`;
             });
 
             articlesList.appendChild(articleDiv);

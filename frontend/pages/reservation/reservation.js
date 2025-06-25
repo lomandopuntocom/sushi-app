@@ -50,7 +50,6 @@ export class Reservation extends HTMLElement {
 
     connectedCallback() {
         console.log('Reservation component added to the DOM');
-        // Aquí podrías añadir lógica para manejar el envío del formulario
         const form = this.shadowRoot.querySelector('.reservation-form');
         form.addEventListener('submit', this.handleSubmit.bind(this));
     }
@@ -64,9 +63,8 @@ export class Reservation extends HTMLElement {
     }
 
     handleSubmit(event) {
-        event.preventDefault(); // Previene el envío por defecto del formulario
+        event.preventDefault();
 
-        // Obtener valores del formulario
         const name = this.shadowRoot.getElementById('name').value;
         const phone = this.shadowRoot.getElementById('phone').value;
         const email = this.shadowRoot.getElementById('email').value;
@@ -78,10 +76,7 @@ export class Reservation extends HTMLElement {
             name, phone, email, guests, date, time
         });
 
-        // Aquí iría la lógica para enviar estos datos a un servidor o API
         alert('Reserva enviada! (Esto es solo una simulación)');
-        // Opcionalmente, resetear el formulario
-        // event.target.reset();
     }
 }
 

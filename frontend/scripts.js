@@ -11,6 +11,8 @@ import { Registration } from './pages/registration/registration.js';
 import { Login } from './pages/login/login.js';
 import { Profile } from './pages/profile/profile.js';
 
+
+
 export const Router = {
     init: () => {
         document.querySelectorAll("a.nav_button").forEach((a) => {

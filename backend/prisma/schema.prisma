@@ -38,6 +38,7 @@ model platillo {
   descripcion   String?
   precio        Decimal?        @db.Decimal(10, 2)
   idcategoria   Int?
+  image         String?         @db.VarChar(100)
   categoria     categoria?      @relation(fields: [idcategoria], references: [id], onDelete: NoAction, onUpdate: NoAction)
   plato_carrito plato_carrito[]
 }

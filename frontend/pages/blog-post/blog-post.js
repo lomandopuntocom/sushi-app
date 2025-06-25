@@ -1,6 +1,3 @@
-// blog-post.js
-import { fakePosts } from "../../mockdata/fakePostsData.js"; // Import the fake data
-
 export class BlogPost extends HTMLElement {
     constructor() {
         super();
@@ -11,9 +8,9 @@ export class BlogPost extends HTMLElement {
             <link rel="stylesheet" href="styles.css">
             <div class="blog-post-container">
                 <div class="left-section">
-                    <img id="main-post-image" src="img/blog-post-main.png" alt="Manos de chef cortando salmón">
+                    <img id="main-post-image" src="img/blog-post-main.png" alt="Blog Post Image">
                     <div class="overlay-content">
-                        </div>
+                    </div>
                 </div>
                 <div class="right-section">
                     <div class="article-meta">
@@ -22,7 +19,7 @@ export class BlogPost extends HTMLElement {
                     <h1 class="article-title" id="post-title"></h1>
 
                     <div class="article-content" id="post-content">
-                        </div>
+                    </div>
 
                     <div class="author-info">
                         <span class="author-label">Author:</span> <span class="author-name" id="post-author"></span>
@@ -35,21 +32,36 @@ export class BlogPost extends HTMLElement {
                 </div>
             </div>
         `;
-
         this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-        // Get references to the elements that will display dynamic content
         this.postTitleElement = this.shadowRoot.getElementById('post-title');
         this.postDateElement = this.shadowRoot.getElementById('post-date');
         this.postContentElement = this.shadowRoot.getElementById('post-content');
         this.postAuthorElement = this.shadowRoot.getElementById('post-author');
         this.mainPostImageElement = this.shadowRoot.getElementById('main-post-image');
+        this.fetchBlogData();
+    }
+
+    async fetchBlogData() {
+        try {
+            const response = await fetch('http://localhost:3000/api/blog');
+            const data = await response.json();
+
+            this.blogData = data.publicaciones;
+
+        } catch (error) {
+            console.error('Error al cargar los datos del menú:', error);
+            this.dishListContainer.innerHTML = '<p>Error al cargar los datos del menú.</p>';
+        }
     }
 
     connectedCallback() {
         console.log('Blog Post component added to the DOM');
-        this.loadBlogPost();
+        this.fetchBlogData().then(() => {
+            this.loadBlogPost();
+        });
     }
+
 
     disconnectedCallback() {
         console.log('Blog Post component removed from the DOM');
@@ -63,27 +75,33 @@ export class BlogPost extends HTMLElement {
             console.error('No post ID found in URL parameters.');
             this.postTitleElement.textContent = 'Error: Post not found';
             this.postContentElement.innerHTML = '<p>Please select a blog post from the main blog page.</p>';
+            this.mainPostImageElement.src = 'https://placehold.co/1200x800/eeeeee/000000?text=Error:+No+Post+ID';
+            this.mainPostImageElement.alt = 'Error: No Post ID found';
             return;
         }
 
-        // Find the post from the imported fakePosts data
-        const post = fakePosts.find(p => p.Id === parseInt(postId));
+        const post = this.blogData.find(p => p.id === parseInt(postId));
 
         if (post) {
-            this.postTitleElement.textContent = post.Nombre;
-            this.postDateElement.textContent = new Date(post.Fecha).toLocaleDateString('en-US', {
+            this.postTitleElement.textContent = post.nombre;
+            this.postDateElement.textContent = new Date(post.fecha).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
                 day: 'numeric'
             }).toUpperCase();
 
-            // Handle plain text content: split by newlines to create paragraphs
-            const paragraphs = post.Contenido.split('\n').filter(p => p.trim() !== ''); // Filter out empty lines
+            const paragraphs = post.contenido.split('\n').filter(p => p.trim() !== '');
             this.postContentElement.innerHTML = paragraphs.map(p => `<p>${p.trim()}</p>`).join('');
 
-            this.postAuthorElement.textContent = post.Autor;
-            this.mainPostImageElement.src = post.ImageUrl;
-            this.mainPostImageElement.alt = post.AltText;
+            this.postAuthorElement.textContent = post.autor;
+            if (post.image) {
+                this.mainPostImageElement.src = post.image;
+                this.mainPostImageElement.alt = post.title || 'Blog Post Image';
+            } else {
+                this.mainPostImageElement.src = 'img/blog-post-main.png';
+                this.mainPostImageElement.alt = 'No image provided for this post.';
+            }
+
         } else {
             this.postTitleElement.textContent = 'Post not found';
             this.postContentElement.innerHTML = '<p>The requested blog post could not be found.</p>';

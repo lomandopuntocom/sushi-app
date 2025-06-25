@@ -51,20 +51,16 @@ export class Cart extends HTMLElement {
 
         this.shadowRoot.appendChild(template.content.cloneNode(true));
 
-        // Get references to dynamic elements
         this.cartItemsList = this.shadowRoot.getElementById('cart-items-list');
         this.cartSubtotalElement = this.shadowRoot.getElementById('cart-subtotal');
         this.cartTotalElement = this.shadowRoot.getElementById('cart-total');
         this.placeOrderButton = this.shadowRoot.querySelector('.place-order-button');
 
-        // Initial render of the cart
         this.renderCart();
     }
 
     connectedCallback() {
         console.log('Cart component added to the DOM');
-        // Listen for the custom 'add-to-cart' event.
-        // Since the event bubbles and is composed, listening on `window` is effective.
         window.addEventListener('add-to-cart', this.handleAddToCartEvent.bind(this));
         if (this.placeOrderButton) {
             this.placeOrderButton.addEventListener('click', this.handlePlaceOrder.bind(this));
@@ -78,8 +74,6 @@ export class Cart extends HTMLElement {
             this.placeOrderButton.removeEventListener('click', this.handlePlaceOrder.bind(this));
         }
     }
-
-    // --- Cart Management Logic ---
 
     loadCartFromLocalStorage() {
         try {
@@ -127,7 +121,7 @@ export class Cart extends HTMLElement {
         if (item) {
             item.quantity += change;
             if (item.quantity <= 0) {
-                this.removeItemFromCart(dishId); // Remove if quantity drops to 0 or less
+                this.removeItemFromCart(dishId);
             } else {
                 this.saveCartToLocalStorage();
                 this.renderCart();
@@ -140,13 +134,13 @@ export class Cart extends HTMLElement {
         this.cartItems.forEach(item => {
             subtotal += item.precio * item.quantity;
         });
-        const shipping = 5.00; // Example fixed shipping
+        const shipping = 5.00;
         const total = subtotal + shipping;
         return { subtotal, shipping, total };
     }
 
     renderCart() {
-        this.cartItemsList.innerHTML = ''; // Clear current items
+        this.cartItemsList.innerHTML = '';
 
         if (this.cartItems.length === 0) {
             this.cartItemsList.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
@@ -167,10 +161,10 @@ export class Cart extends HTMLElement {
     createCartItemElement(item) {
         const cartItemDiv = document.createElement('div');
         cartItemDiv.classList.add('cart-item');
-        cartItemDiv.dataset.dishId = item.id; // Store ID for quick access
+        cartItemDiv.dataset.dishId = item.id;
 
         cartItemDiv.innerHTML = `
-            <img src="${item.imagen}" alt="${item.nombre}">
+            <img src="${item.image}" alt="${item.nombre}">
             <div class="item-details">
                 <h3 class="item-name">${item.nombre}</h3>
                 <p class="item-description">${item.descripcion}</p>
@@ -186,7 +180,6 @@ export class Cart extends HTMLElement {
             <button class="remove-item-button" data-id="${item.id}">X</button>
         `;
 
-        // Attach event listeners for quantity changes and removal
         cartItemDiv.querySelector('.qty-minus').addEventListener('click', () => this.updateItemQuantity(item.id, -1));
         cartItemDiv.querySelector('.qty-plus').addEventListener('click', () => this.updateItemQuantity(item.id, 1));
         cartItemDiv.querySelector('.remove-item-button').addEventListener('click', () => this.removeItemFromCart(item.id));
@@ -199,11 +192,9 @@ export class Cart extends HTMLElement {
             alert('Your cart is empty. Please add items before placing an order.');
             return;
         }
-        // In a real application, you would send the cart data to a backend
-        // and handle the order placement logic here.
         alert('Order Placed! (This is a simulation)');
         console.log('Place Order button clicked with cart:', this.cartItems);
-        this.cartItems = []; // Clear cart after placing order
+        this.cartItems = [];
         this.saveCartToLocalStorage();
         this.renderCart();
     }

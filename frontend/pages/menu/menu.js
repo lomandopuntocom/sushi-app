@@ -1,4 +1,3 @@
-// pages/menu/menu.js (ACTUALIZADO)
 import { menuData } from '../../mockdata/platos.js'; // Importa los datos del menú
 
 export class menu extends HTMLElement {
@@ -6,7 +5,6 @@ export class menu extends HTMLElement {
         super();
         this.attachShadow({ mode: 'open' });
 
-        this.menuData = menuData;
 
         const template = document.createElement('template');
         template.innerHTML = `
@@ -35,14 +33,28 @@ export class menu extends HTMLElement {
 
         this.dishDescriptionElement.textContent = '';
         this.dishDescriptionElement.style.opacity = '0';
+        this.fetchMenuData();
+    }
+
+    async fetchMenuData() {
+    try {
+        const response = await fetch('http://localhost:3000/api/menu');
+        const data = await response.json();
+
+        this.menuData = data;
 
         this.renderCategories();
-        this.renderDishes('all');
+        this.renderDishes(1);
+    } catch (error) {
+        console.error('Error al cargar los datos del menú:', error);
+        this.dishListContainer.innerHTML = '<p>Error al cargar los datos del menú.</p>';
     }
+}
+
 
     renderCategories() {
         this.menuFilterList.innerHTML = '';
-        const allCategory = this.menuData.categorias.find(cat => cat.id === 'all');
+        const allCategory = this.menuData.categorias.find(cat => cat.id === 1);
         if (allCategory) {
             const listItem = document.createElement('li');
             listItem.classList.add('menu-filter-card', 'active');
@@ -52,7 +64,7 @@ export class menu extends HTMLElement {
             this.menuFilterList.appendChild(listItem);
         }
 
-        this.menuData.categorias.filter(cat => cat.id !== 'all').forEach(category => {
+        this.menuData.categorias.filter(cat => cat.id !== 1).forEach(category => {
             const listItem = document.createElement('li');
             listItem.classList.add('menu-filter-card');
             listItem.textContent = category.nombre;
@@ -68,12 +80,11 @@ export class menu extends HTMLElement {
         this.menuTitleElement.textContent = 'MENU';
         this.dishDescriptionElement.textContent = '';
         this.dishDescriptionElement.style.opacity = '0';
-        this.menuImageSection.style.backgroundImage = 'url(img/menu.png)'; // Corrected to use 'menu.png' from the template
-
-        if (categoryId === 'all') {
-            const actualCategories = this.menuData.categorias.filter(cat => cat.id !== 'all');
+        this.menuImageSection.style.backgroundImage = 'url(img/menu.png)';
+        if (categoryId === 1) {
+            const actualCategories = this.menuData.categorias.filter(cat => cat.id !== 1);
             actualCategories.forEach(category => {
-                const categoryDishes = this.menuData.platillos.filter(dish => dish.idCategoria === category.id);
+                const categoryDishes = this.menuData.platillos.filter(dish => dish.idcategoria === category.id);
 
                 if (categoryDishes.length > 0) {
                     const categoryTitle = document.createElement('h1');
@@ -92,7 +103,7 @@ export class menu extends HTMLElement {
             });
         } else {
             const selectedCategory = this.menuData.categorias.find(cat => cat.id === categoryId);
-            const categoryDishes = this.menuData.platillos.filter(dish => dish.idCategoria === categoryId);
+            const categoryDishes = this.menuData.platillos.filter(dish => dish.idcategoria === categoryId);
 
             if (selectedCategory && categoryDishes.length > 0) {
                 const dishList = document.createElement('ul');
@@ -114,7 +125,7 @@ export class menu extends HTMLElement {
         const listItem = document.createElement('li');
         listItem.classList.add('menu-card-body');
         listItem.innerHTML = `
-            <div class="menu-card-thumbnail" style="background-image: url('${dish.imagen}')"></div>
+            <div class="menu-card-thumbnail" style="background-image: url('${dish.image}')"></div>
             <div class="menu-card-info">
                 <div class="menu-card-info-header">
                     <h2>${dish.nombre}</h2>
@@ -131,12 +142,12 @@ export class menu extends HTMLElement {
 
         const addToCartButton = listItem.querySelector('.add-to-cart-button');
         addToCartButton.addEventListener('click', (event) => {
-            event.stopPropagation(); // Prevent listItem's click event from firing
+            event.stopPropagation();
             this.handleAddToCart(dish);
         });
 
         listItem.addEventListener('click', () => {
-            this.menuImageSection.style.backgroundImage = `url('${dish.imagen}')`;
+            this.menuImageSection.style.backgroundImage = `url('${dish.image}')`;
             this.menuTitleElement.textContent = dish.nombre;
             this.dishDescriptionElement.textContent = dish.descripcion;
             this.dishDescriptionElement.style.opacity = '1';
@@ -159,13 +170,11 @@ export class menu extends HTMLElement {
 
     handleAddToCart(dish) {
         console.log(`Adding ${dish.nombre} (ID: ${dish.id}, Price: $${dish.precio.toFixed(2)}) to cart.`);
-        // Emitir un evento personalizado para que el componente del carrito lo capture
         this.dispatchEvent(new CustomEvent('add-to-cart', {
             detail: { dish: dish },
-            bubbles: true,   // El evento "burbujea" y puede ser escuchado por padres
-            composed: true   // El evento puede atravesar los límites del Shadow DOM
+            bubbles: true,
+            composed: true
         }));
-        // alert(`${dish.nombre} added to cart!`); // Feedback al usuario - Considerar algo menos intrusivo en una app real
     }
 
     connectedCallback() {
@@ -174,9 +183,6 @@ export class menu extends HTMLElement {
 
     disconnectedCallback() {
         console.log('Menu component removed from the DOM');
-        // No necesitamos limpiar listeners creados en createDishCard porque listItem y sus hijos
-        // son eliminados del DOM cuando renderDishes limpia dishListContainer.
-        // Los listeners en menuFilterList se crean una vez y se limpian si el componente entero se remueve.
     }
 }
 

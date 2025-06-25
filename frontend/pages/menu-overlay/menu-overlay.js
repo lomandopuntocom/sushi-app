@@ -1,5 +1,4 @@
-// pages/menu-overlay/menu-overlay.js
-import { Router } from '../../scripts.js'; // Asumiendo que 'scripts.js' es donde está tu Router
+import { Router } from '../../scripts.js';
 
 export class MenuOverlay extends HTMLElement {
     constructor() {
@@ -28,23 +27,19 @@ export class MenuOverlay extends HTMLElement {
         const closeButton = this.shadowRoot.querySelector('.close-menu-button');
         const overlayContainer = this.shadowRoot.querySelector('.menu-overlay-container');
 
-        // Event listener para cerrar el menú
         if (closeButton) {
             closeButton.addEventListener('click', () => {
                 overlayContainer.classList.remove('open');
-                document.body.style.overflow = ''; // Restaurar scroll del cuerpo
-                // Emitir un evento personalizado para que la navbar sepa que debe cerrarse
+                document.body.style.overflow = '';
                 this.dispatchEvent(new CustomEvent('menu-closed', { bubbles: true, composed: true }));
             });
         }
 
-        // Manejo de la navegación para todos los enlaces del overlay
         this.shadowRoot.querySelectorAll('.overlay-nav-link').forEach(link => {
             link.addEventListener('click', (event) => {
                 event.preventDefault();
                 const href = event.target.getAttribute('href');
                 Router.go(href);
-                // Cerrar el menú después de navegar
                 overlayContainer.classList.remove('open');
                 document.body.style.overflow = '';
                 this.dispatchEvent(new CustomEvent('menu-closed', { bubbles: true, composed: true }));
@@ -52,23 +47,11 @@ export class MenuOverlay extends HTMLElement {
         });
     }
 
-    disconnectedCallback() {
-        const closeButton = this.shadowRoot.querySelector('.close-menu-button');
-        if (closeButton) {
-            closeButton.removeEventListener('click', () => { /* ... */ });
-        }
-        this.shadowRoot.querySelectorAll('.overlay-nav-link').forEach(link => {
-            link.removeEventListener('click', () => { /* ... */ });
-        });
-    }
-
-    // Método para abrir el menú desde fuera (e.g., desde la Navbar)
     openMenu() {
         this.shadowRoot.querySelector('.menu-overlay-container').classList.add('open');
-        document.body.style.overflow = 'hidden'; // Deshabilitar scroll del cuerpo
+        document.body.style.overflow = 'hidden';
     }
 
-    // Método para cerrar el menú desde fuera
     closeMenu() {
         this.shadowRoot.querySelector('.menu-overlay-container').classList.remove('open');
         document.body.style.overflow = '';

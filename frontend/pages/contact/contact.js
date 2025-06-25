@@ -76,7 +76,6 @@ export class Contact extends HTMLElement {
 
     connectedCallback() {
         console.log('Contact component added to the DOM');
-        // Asegúrate de que todas las imágenes referenciadas existan en tus assets
     }
 
     disconnectedCallback() {
