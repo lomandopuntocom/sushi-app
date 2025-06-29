@@ -1,4 +1,3 @@
-import { Router } from '../../scripts.js';
 import { MenuOverlay } from '../menu-overlay/menu-overlay.js';
 
 export class Navbar extends HTMLElement {
@@ -9,11 +8,11 @@ export class Navbar extends HTMLElement {
         const template = document.createElement('template');
         template.innerHTML = `
             <link rel="stylesheet" href="./styles.css"> <div class="first-navbar-body">
-                <button class="first-navbar-button-burger">≡</button>
+                <a class="first-navbar-button-burger">≡</a>
                 <a class="first-navbar-logo nav-link" href="/">Qitchen</a>
                 <a class="first-navbar-link nav-link desktop-only" href="/menu">Menu</a>
                 <a class="first-navbar-link nav-link desktop-only" href="/about">About</a>
-                <button class="first-navbar-button-reservation nav-link desktop-only" data-href="/reservation">Book A Table</button>
+                <a class="first-navbar-button-reservation nav-link desktop-only" href="/reservation">Book A Table</a>
             </div>
             <div class="second-navbar-body" style="margin-left:40%">
                 <a href="/profile" class="secon-navbar-button nav-link">🙎</a>
@@ -36,13 +35,6 @@ export class Navbar extends HTMLElement {
                 menuOverlay.openMenu();
             });
         }
-        this.shadowRoot.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                const href = event.target.getAttribute('href') || event.target.dataset.href;
-                Router.go(href);
-            });
-        });
     }
 }
 

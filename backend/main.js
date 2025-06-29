@@ -1,9 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const usuarioRoutes = require('./routes/usuarioRoutes');
 const menuRoutes = require('./routes/menuRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const loginRoutes = require('./routes/loginRoutes');
+const registerRoutes = require('./routes/registerRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -21,7 +22,9 @@ app.get('/', (req, res) => {
   res.send('¡Sushi App!');
 });
 
-app.use('/api/usuario', usuarioRoutes);
+app.use('/api/login', loginRoutes);
+
+app.use('/api/register', registerRoutes);
 
 app.use('/api/menu', menuRoutes);
 

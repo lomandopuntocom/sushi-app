@@ -20,7 +20,9 @@ export class Blog extends HTMLElement {
                     </div>
 
                     <div class="articles-list">
-                        </div>
+                    </div>
+
+                    <button id="add-post-button" class="add-post-button">Add New Post</button>
 
                     <div class="footer-links">
                         <a href="#">Licensing</a>
@@ -42,22 +44,40 @@ export class Blog extends HTMLElement {
             this.blogData = data.publicaciones;
             this.loadBlogPosts();
         } catch (error) {
-            console.error('Error al cargar los datos del menú:', error);
-            this.dishListContainer.innerHTML = '<p>Error al cargar los datos del menú.</p>';
+            console.error('Error al cargar los datos del blog:', error);
+            const articlesList = this.shadowRoot.querySelector('.articles-list');
+            articlesList.innerHTML = '<p>Error al cargar los datos del blog.</p>';
         }
     }
 
     connectedCallback() {
         console.log('Blog component added to the DOM');
+        const addPostButton = this.shadowRoot.querySelector('#add-post-button');
+        if (addPostButton) {
+            addPostButton.addEventListener('click', this.navigateToAddPost);
+        }
     }
 
     disconnectedCallback() {
         console.log('Blog component removed from the DOM');
+        const addPostButton = this.shadowRoot.querySelector('#add-post-button');
+        if (addPostButton) {
+            addPostButton.removeEventListener('click', this.navigateToAddPost);
+        }
+    }
+
+    navigateToAddPost() {
+        window.location.href = '/add-blog-post';
     }
 
     async loadBlogPosts() {
         const articlesList = this.shadowRoot.querySelector('.articles-list');
         articlesList.innerHTML = '';
+
+        if (!this.blogData || this.blogData.length === 0) {
+            articlesList.innerHTML = '<p>No blog posts available.</p>';
+            return;
+        }
 
         this.blogData.forEach(post => {
             const articleDiv = document.createElement('div');
@@ -85,4 +105,3 @@ export class Blog extends HTMLElement {
 }
 
 customElements.define('blog-component', Blog);
-

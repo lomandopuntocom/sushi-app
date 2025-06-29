@@ -1,5 +1,3 @@
-import { Router } from '../../scripts.js';
-
 export class MenuOverlay extends HTMLElement {
     constructor() {
         super();
@@ -25,26 +23,11 @@ export class MenuOverlay extends HTMLElement {
 
     connectedCallback() {
         const closeButton = this.shadowRoot.querySelector('.close-menu-button');
-        const overlayContainer = this.shadowRoot.querySelector('.menu-overlay-container');
-
         if (closeButton) {
             closeButton.addEventListener('click', () => {
-                overlayContainer.classList.remove('open');
-                document.body.style.overflow = '';
                 this.dispatchEvent(new CustomEvent('menu-closed', { bubbles: true, composed: true }));
             });
         }
-
-        this.shadowRoot.querySelectorAll('.overlay-nav-link').forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                const href = event.target.getAttribute('href');
-                Router.go(href);
-                overlayContainer.classList.remove('open');
-                document.body.style.overflow = '';
-                this.dispatchEvent(new CustomEvent('menu-closed', { bubbles: true, composed: true }));
-            });
-        });
     }
 
     openMenu() {

@@ -1,5 +1,3 @@
-import { menuData } from '../../mockdata/platos.js'; // Importa los datos del menú
-
 export class menu extends HTMLElement {
     constructor() {
         super();

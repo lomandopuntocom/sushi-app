@@ -14,6 +14,7 @@
 @import url(blocks/login/login.css);
 @import url(blocks/profile/profile.css);
 @import url(blocks/menu-overlay/menu-overlay.css);
+@import url(blocks/add-blog-post/add-blog-post.css);
 
 html{
     height: 100%;
