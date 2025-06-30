@@ -1,3 +1,6 @@
+import { authService } from '../../services/authService.js';
+import { Router } from '../../services/router.js';
+
 export class Registration extends HTMLElement {
     constructor() {
         super();
@@ -174,39 +177,21 @@ export class Registration extends HTMLElement {
         });
 
         // Simulate API call
-        this.simulateRegistration({ name, phone, email, password, address })
+        authService.register(email, password, name, phone, address)
             .then(response => {
-                alert('Registration successful!');
-                // Potentially redirect or show a success message
-                this.form.reset(); // Clear the form after successful submission
+                delete response.user.contrasena;
+                localStorage.setItem('UCBuser', JSON.stringify(response.user));
+                const authChangeEvent = new CustomEvent('auth-status-changed', {
+                    bubbles: true,
+                    composed: true
+                });
+                document.dispatchEvent(authChangeEvent);
+                Router.go('/');
             })
             .catch(error => {
                 alert(`Registration failed: ${error.message}`);
                 // Handle specific error messages from the backend
             });
-    }
-
-    // --- New functionality ---
-
-    /**
-     * Simulates an asynchronous API call for registration.
-     * In a real application, this would be an actual fetch() request to your backend.
-     * @param {object} userData - The data to be registered.
-     * @returns {Promise<object>} - A promise that resolves with a success message or rejects with an error.
-     */
-    simulateRegistration(userData) {
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                const randomSuccess = Math.random() > 0.2; // 80% chance of success
-                if (randomSuccess) {
-                    console.log('Simulated backend success:', userData);
-                    resolve({ message: 'User registered successfully!' });
-                } else {
-                    console.error('Simulated backend error: Email already exists.');
-                    reject(new Error('Email already exists.'));
-                }
-            }, 1500); // Simulate network delay
-        });
     }
 }
 

@@ -1,4 +1,7 @@
-// login.js
+import { Router } from '../../services/router.js';
+
+import authService from '../../services/authService.js';
+
 export class Login extends HTMLElement {
     constructor() {
         super();
@@ -23,10 +26,10 @@ export class Login extends HTMLElement {
                             <input type="email" id="email" name="email" placeholder="Email" required>
                         </div>
                         <div class="form-group">
-                            <input type="password" id="password" name="password" placeholder="Password" required>
+                            <input type="password" id="contrasena" name="contrasena" placeholder="Password" required>
                         </div>
                         <button type="submit" class="login-button">LOGIN</button>
-                        <a href="#/registration" class="registration-link">Go to registration instead</a>
+                        <a href="/registration" class="registration-link">Go to registration instead</a>
                     </form>
 
                     <div class="footer-links">
@@ -56,15 +59,33 @@ export class Login extends HTMLElement {
 
     handleSubmit(event) {
         event.preventDefault();
-
+    
         const email = this.shadowRoot.getElementById('email').value;
-        const password = this.shadowRoot.getElementById('password').value;
-
-        console.log('Formulario de login enviado:', {
-            email, password
-        });
-
-        alert('Inicio de sesión simulado! (Valida tus credenciales con el backend)');
+        const contrasena = this.shadowRoot.getElementById('contrasena').value;
+    
+        const errorContainer = this.shadowRoot.querySelector('.error-message');
+        if (errorContainer) errorContainer.remove();
+    
+        authService.login(email, contrasena)
+            .then(data => {
+                console.log('Login success:', data);
+                delete data.user.contrasena;
+                localStorage.setItem('UCBuser', JSON.stringify(data.user));
+                const authChangeEvent = new CustomEvent('auth-status-changed', {
+                    bubbles: true,
+                    composed: true
+                });
+                document.dispatchEvent(authChangeEvent);
+                Router.go('/');
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                const errorMsg = document.createElement('div');
+                errorMsg.classList.add('error-message');
+                errorMsg.textContent = error.message;
+                const form = this.shadowRoot.querySelector('.login-form');
+                form.appendChild(errorMsg);
+            });
     }
 }
 
