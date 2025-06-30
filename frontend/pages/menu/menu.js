@@ -72,7 +72,7 @@ export class menu extends HTMLElement {
         });
     }
 
-    renderDishes(categoryId) {
+    /*renderDishes(categoryId) {
         this.dishListContainer.innerHTML = '';
 
         this.menuTitleElement.textContent = 'MENU';
@@ -118,7 +118,7 @@ export class menu extends HTMLElement {
             }
         }
     }
-
+    */
     createDishCard(dish) {
         const listItem = document.createElement('li');
         listItem.classList.add('menu-card-body');
