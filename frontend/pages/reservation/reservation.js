@@ -62,21 +62,47 @@ export class Reservation extends HTMLElement {
         }
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
-
         const name = this.shadowRoot.getElementById('name').value;
         const phone = this.shadowRoot.getElementById('phone').value;
         const email = this.shadowRoot.getElementById('email').value;
         const guests = this.shadowRoot.getElementById('guests').value;
         const date = this.shadowRoot.getElementById('date').value;
         const time = this.shadowRoot.getElementById('time').value;
+        const fulldate = date + "T" + time + ":00Z";
 
-        console.log('Formulario de reserva enviado:', {
-            name, phone, email, guests, date, time
-        });
+        const newReservation = {
+            "nombre": name,
+            "telefono": phone,
+            "email": email,
+            "invitados": Math.trunc(guests),
+            "fecha": fulldate,
+            "tiempo": fulldate
+        };
 
-        alert('Reserva enviada! (Esto es solo una simulación)');
+        try{
+            const response = await fetch('http://localhost:3000/api/reservation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newReservation)
+            })
+
+            if(!response.ok) {
+                const errorData = await response.json()
+                throw new Error(errorData.message || 'Failed to add reservation')
+            }
+
+            const result = await response.json();
+            console.log('Reservation posted succesfully', result)
+            alert('Reservation posted succesfully')
+        }
+        catch(error) {
+            console.error('Error adding reservation:', error);
+            alert(`Error adding reservation: ${error.message}`);
+        }
     }
 }
 

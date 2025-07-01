@@ -60,11 +60,7 @@ export class Login extends HTMLElement {
         const email = this.shadowRoot.getElementById('email').value;
         const password = this.shadowRoot.getElementById('password').value;
 
-        console.log('Formulario de login enviado:', {
-            email, password
-        });
-
-        alert('Inicio de sesión simulado! (Valida tus credenciales con el backend)');
+        
     }
 }
 

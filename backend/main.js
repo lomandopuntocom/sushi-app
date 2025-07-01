@@ -5,6 +5,8 @@ const menuRoutes = require('./routes/menuRoutes');
 const blogRoutes = require('./routes/blogRoutes');
 const loginRoutes = require('./routes/loginRoutes');
 const registerRoutes = require('./routes/registerRoutes');
+const reservationRoutes = require('./routes/reservationRoutes')
+const sessionRoutes = require('./routes/sessionRoutes')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,13 +24,14 @@ app.get('/', (req, res) => {
   res.send('¡Sushi App!');
 });
 
-app.use('/api/login', loginRoutes);
-
-app.use('/api/register', registerRoutes);
+app.use('/api/session', sessionRoutes)
 
 app.use('/api/menu', menuRoutes);
 
 app.use('/api/blog', blogRoutes);
+
+app.use('/api/reservation', reservationRoutes);
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);

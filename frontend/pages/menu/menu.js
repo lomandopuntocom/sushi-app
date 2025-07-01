@@ -72,7 +72,7 @@ export class menu extends HTMLElement {
         });
     }
 
-    /*renderDishes(categoryId) {
+    renderDishes(categoryId) {
         this.dishListContainer.innerHTML = '';
 
         this.menuTitleElement.textContent = 'MENU';
@@ -118,7 +118,6 @@ export class menu extends HTMLElement {
             }
         }
     }
-    */
     createDishCard(dish) {
         const listItem = document.createElement('li');
         listItem.classList.add('menu-card-body');
@@ -175,13 +174,6 @@ export class menu extends HTMLElement {
         }));
     }
 
-    connectedCallback() {
-        console.log('Menu component added to the DOM');
-    }
-
-    disconnectedCallback() {
-        console.log('Menu component removed from the DOM');
-    }
 }
 
 customElements.define('menu-component', menu);
