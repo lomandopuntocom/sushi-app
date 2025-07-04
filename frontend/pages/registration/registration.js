@@ -138,7 +138,7 @@ export class Registration extends HTMLElement {
         }
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
 
         let formIsValid = true;
@@ -169,18 +169,29 @@ export class Registration extends HTMLElement {
         const email = this.shadowRoot.getElementById('email').value;
         const address = this.shadowRoot.getElementById('address').value;
 
-        console.log('Formulario de registro enviado:', {
-            name, phone, email, password, address
-        });
+        const newUser = {
+            "nombre": name,
+            "telefono": phone,
+            "email": email,
+            "direccion": address,
+            "contrasena": password
+        }
 
-        this.simulateRegistration({ name, phone, email, password, address })
-            .then(response => {
-                alert('Registration successful!');
-                this.form.reset();
-            })
-            .catch(error => {
-                alert(`Registration failed: ${error.message}`);
-            });
+        const response = await fetch('http://localhost:3000/api/session/registration', {
+            method: "POST",
+            headers:{
+                    'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newUser)
+        })
+
+        if(!response.ok){
+            const errorData = await response.json();
+            console.log('Failed to register' || errorData.message )
+        }
+
+        const result = await response.json()
+        
     }
 }
 

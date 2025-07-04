@@ -54,13 +54,42 @@ export class Login extends HTMLElement {
         }
     }
 
-    handleSubmit(event) {
+    async handleSubmit(event) {
         event.preventDefault();
 
         const email = this.shadowRoot.getElementById('email').value;
         const password = this.shadowRoot.getElementById('password').value;
 
-        
+        const credentials = {
+            "email": email,
+            "contrasena": password
+        }
+
+        try{
+            const response = await fetch('http://localhost:3000/api/session/login',{
+                method: 'POST',
+                headers:{
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(credentials)
+            })
+
+            if(!response.ok){
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to login')
+            }
+
+            const result = await response.json();
+            delete result.user.contrasena;
+            localStorage.setItem('Sushi-user', JSON.stringify(result.user));
+            console.log('Login succesful', result.message);
+            alert('Succesful Login');
+            window.location.href = '/';
+        }
+        catch (error){
+            console.error('Error during login:', error);
+            alert(`Error to login: ${error.message}`);
+        }
     }
 }
 
