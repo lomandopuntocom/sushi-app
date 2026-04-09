@@ -110,4 +110,6 @@ export class Navbar extends HTMLElement {
     }
 }
 
-customElements.define('navbar-component', Navbar);
+if (!customElements.get('navbar-component')) {
+    customElements.define('navbar-component', Navbar);
+}

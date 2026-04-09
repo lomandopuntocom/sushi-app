@@ -21,6 +21,7 @@
     "morgan": "^1.10.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.4.11",
     "prisma": "^6.10.1"
   }
 }

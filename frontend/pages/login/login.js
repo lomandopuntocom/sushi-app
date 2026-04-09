@@ -89,4 +89,6 @@ export class Login extends HTMLElement {
     }
 }
 
-customElements.define('login-component', Login);
+if (!customElements.get('login-component')) {
+    customElements.define('login-component', Login);
+}

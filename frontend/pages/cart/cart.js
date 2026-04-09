@@ -1,9 +1,9 @@
+import cartService from '../../services/cartService.js';
+
 export class Cart extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: 'open' });
-
-        this.cartItems = this.loadCartFromLocalStorage();
 
         const template = document.createElement('template');
         template.innerHTML = `
@@ -61,77 +61,36 @@ export class Cart extends HTMLElement {
 
     connectedCallback() {
         console.log('Cart component added to the DOM');
-        window.addEventListener('add-to-cart', this.handleAddToCartEvent.bind(this));
         if (this.placeOrderButton) {
             this.placeOrderButton.addEventListener('click', this.handlePlaceOrder.bind(this));
         }
+        // Subscribe to cart changes
+        this.unsubscribe = this.subscribeToCart();
+        // Initial render
+        this.renderCart();
     }
 
     disconnectedCallback() {
         console.log('Cart component removed from the DOM');
-        window.removeEventListener('add-to-cart', this.handleAddToCartEvent.bind(this));
         if (this.placeOrderButton) {
             this.placeOrderButton.removeEventListener('click', this.handlePlaceOrder.bind(this));
         }
-    }
-
-    loadCartFromLocalStorage() {
-        try {
-            const storedCart = localStorage.getItem('qitchen-cart');
-            return storedCart ? JSON.parse(storedCart) : [];
-        } catch (e) {
-            console.error("Error loading cart from local storage:", e);
-            return [];
+        // Unsubscribe from cart changes
+        if (this.unsubscribe) {
+            this.unsubscribe();
         }
     }
 
-    saveCartToLocalStorage() {
-        try {
-            localStorage.setItem('qitchen-cart', JSON.stringify(this.cartItems));
-        } catch (e) {
-            console.error("Error saving cart to local storage:", e);
-        }
-    }
-
-    handleAddToCartEvent(event) {
-        const dish = event.detail.dish;
-        this.addItemToCart(dish);
-    }
-
-    addItemToCart(dish) {
-        const existingItem = this.cartItems.find(item => item.id === dish.id);
-
-        if (existingItem) {
-            existingItem.quantity++;
-        } else {
-            this.cartItems.push({ ...dish, quantity: 1 });
-        }
-        this.saveCartToLocalStorage();
-        this.renderCart();
-    }
-
-    removeItemFromCart(dishId) {
-        this.cartItems = this.cartItems.filter(item => item.id !== dishId);
-        this.saveCartToLocalStorage();
-        this.renderCart();
-    }
-
-    updateItemQuantity(dishId, change) {
-        const item = this.cartItems.find(item => item.id === dishId);
-        if (item) {
-            item.quantity += change;
-            if (item.quantity <= 0) {
-                this.removeItemFromCart(dishId);
-            } else {
-                this.saveCartToLocalStorage();
-                this.renderCart();
-            }
-        }
+    subscribeToCart() {
+        const listener = () => this.renderCart();
+        cartService.subscribe(listener);
+        return () => cartService.unsubscribe(listener);
     }
 
     calculateTotals() {
+        const cartItems = cartService.getCartItems();
         let subtotal = 0;
-        this.cartItems.forEach(item => {
+        cartItems.forEach(item => {
             subtotal += item.precio * item.quantity;
         });
         const shipping = 5.00;
@@ -140,14 +99,15 @@ export class Cart extends HTMLElement {
     }
 
     renderCart() {
+        const cartItems = cartService.getCartItems();
         this.cartItemsList.innerHTML = '';
 
-        if (this.cartItems.length === 0) {
+        if (cartItems.length === 0) {
             this.cartItemsList.innerHTML = '<p class="empty-cart-message">Your cart is empty.</p>';
             this.placeOrderButton.disabled = true;
         } else {
             this.placeOrderButton.disabled = false;
-            this.cartItems.forEach(item => {
+            cartItems.forEach(item => {
                 this.cartItemsList.appendChild(this.createCartItemElement(item));
             });
         }
@@ -164,7 +124,7 @@ export class Cart extends HTMLElement {
         cartItemDiv.dataset.dishId = item.id;
 
         cartItemDiv.innerHTML = `
-            <img src="${item.image}" alt="${item.nombre}">
+            <img src="${item.imagen || item.image}" alt="${item.nombre}">
             <div class="item-details">
                 <h3 class="item-name">${item.nombre}</h3>
                 <p class="item-description">${item.descripcion}</p>
@@ -180,24 +140,27 @@ export class Cart extends HTMLElement {
             <button class="remove-item-button" data-id="${item.id}">X</button>
         `;
 
-        cartItemDiv.querySelector('.qty-minus').addEventListener('click', () => this.updateItemQuantity(item.id, -1));
-        cartItemDiv.querySelector('.qty-plus').addEventListener('click', () => this.updateItemQuantity(item.id, 1));
-        cartItemDiv.querySelector('.remove-item-button').addEventListener('click', () => this.removeItemFromCart(item.id));
+        cartItemDiv.querySelector('.qty-minus').addEventListener('click', () => cartService.updateItemQuantity(item.id, -1));
+        cartItemDiv.querySelector('.qty-plus').addEventListener('click', () => cartService.updateItemQuantity(item.id, 1));
+        cartItemDiv.querySelector('.remove-item-button').addEventListener('click', () => cartService.removeItemFromCart(item.id));
 
         return cartItemDiv;
     }
 
     handlePlaceOrder() {
-        if (this.cartItems.length === 0) {
+        const cartItems = cartService.getCartItems();
+        if (cartItems.length === 0) {
             alert('Your cart is empty. Please add items before placing an order.');
             return;
         }
         alert('Order Placed! (This is a simulation)');
-        console.log('Place Order button clicked with cart:', this.cartItems);
-        this.cartItems = [];
-        this.saveCartToLocalStorage();
+        console.log('Place Order button clicked with cart:', cartItems);
+        cartService.clearCart();
         this.renderCart();
     }
 }
 
-customElements.define('cart-component', Cart);
+// Only define once
+if (!customElements.get('cart-component')) {
+    customElements.define('cart-component', Cart);
+}

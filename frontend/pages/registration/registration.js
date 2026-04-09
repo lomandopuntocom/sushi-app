@@ -1,4 +1,4 @@
-import { authService } from '../../services/authService.js';
+import authService from '../../services/authService.js';
 import { Router } from '../../services/router.js';
 
 export class Registration extends HTMLElement {
@@ -195,4 +195,6 @@ export class Registration extends HTMLElement {
     }
 }
 
-customElements.define('registration-component', Registration);
+if (!customElements.get('registration-component')) {
+    customElements.define('registration-component', Registration);
+}
