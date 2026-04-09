@@ -1,43 +1,28 @@
-const prisma = require('../prisma/client');
+const {
+  publicaciones,
+  createPost: createBlogPost,
+  savePost: saveBlogPost,
+  getSavedPostsForUser
+} = require('../mockdata/blogData');
 
 const getPosts = async (req, res) => {
   try {
-    const publicaciones = await prisma.publicaciones.findMany({});
     res.json({ publicaciones });
   } catch (error) {
-    console.error('Error fetching menu:', error);
+    console.error('Error fetching blog posts:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
 
-getPostById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const publicacion = await prisma.publicaciones.findUnique({ where: { id: Number(id) } });
-    res.json(publicacion);
-  } catch (error) {
-    console.error('Error fetching post:', error);
-    res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
-savePost = async (req, res) => {
+const savePost = async (req, res) => {
   try {
     const { idusuario, idpublicacion } = req.body;
-    // Crea un registro en la tabla guardado, si no existe
-    const guardado = await prisma.guardado.upsert({
-      where: {
-        idpublicacion_idusuario: {
-          idpublicacion: Number(idpublicacion),
-          idusuario: Number(idusuario)
-        }
-      },
-      update: {}, // No actualiza nada si ya existe
-      create: {
-        idpublicacion: Number(idpublicacion),
-        idusuario: Number(idusuario)
-      }
-    });
+
+    if (!idusuario || !idpublicacion) {
+      return res.status(400).json({ error: 'idusuario and idpublicacion are required' });
+    }
+
+    const guardado = saveBlogPost({ idusuario, idpublicacion });
     res.json(guardado);
   } catch (error) {
     console.error('Error saving post:', error);
@@ -45,17 +30,15 @@ savePost = async (req, res) => {
   }
 };
 
-// Obtener publicaciones guardadas de un usuario
-getSavedPosts = async (req, res) => {
+const getSavedPosts = async (req, res) => {
   try {
     const { idusuario } = req.params;
-    const guardados = await prisma.guardado.findMany({
-      where: { idusuario: Number(idusuario) },
-      include: { publicaciones: true }
-    });
-    // Solo devolver los datos de la publicación
-    const publicaciones = guardados.map(g => g.publicaciones).filter(Boolean);
-    res.json(publicaciones);
+    if (!idusuario) {
+      return res.status(400).json({ error: 'idusuario is required' });
+    }
+
+    const publicacionesGuardadas = getSavedPostsForUser(idusuario);
+    res.json(publicacionesGuardadas);
   } catch (error) {
     console.error('Error fetching saved posts:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -64,10 +47,13 @@ getSavedPosts = async (req, res) => {
 
 const createPost = async (req, res) => {
   try {
-    const { idusuario, nombre, autor, contenido } = req.body;
-    const publicacion = await prisma.publicaciones.create({
-      data: { idusuario, nombre, autor, contenido, fecha: new Date() }
-    });
+    const { idusuario, nombre, autor, contenido, fecha } = req.body;
+
+    if (!nombre || !autor || !contenido) {
+      return res.status(400).json({ error: 'nombre, autor and contenido are required' });
+    }
+
+    const publicacion = createBlogPost({ idusuario, nombre, autor, contenido, fecha });
     res.json(publicacion);
   } catch (error) {
     console.error('Error creating post:', error);

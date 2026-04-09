@@ -1,38 +1,27 @@
-import { findUserByEmail, addUser, getAllUsers, initializeMockUsers } from '../mockdata/mockUsers.js';
-
 export const authService = {
     login: async (email, contrasena) => {
         if (!contrasena || !email) {
             throw new Error('Email and password are required');
         }
 
-        try {
-            // Initialize mock users on first login
-            initializeMockUsers();
+        const response = await fetch('http://localhost:3000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, contrasena })
+        });
 
-            // Find user in mock data
-            const user = findUserByEmail(email);
-
-            if (!user) {
-                throw new Error('Invalid credentials');
-            }
-
-            if (user.contrasena !== contrasena) {
-                throw new Error('Invalid credentials');
-            }
-
-            // Store user in localStorage
-            const userToStore = { ...user };
-            delete userToStore.contrasena; // Don't store password
-            localStorage.setItem('UCBuser', JSON.stringify(userToStore));
-
-            return {
-                message: 'Login successful',
-                user: userToStore
-            };
-        } catch (error) {
-            throw error;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Invalid credentials');
         }
+
+        const result = await response.json();
+        const userToStore = result.user;
+        localStorage.setItem('UCBuser', JSON.stringify(userToStore));
+        return {
+            message: 'Login successful',
+            user: userToStore
+        };
     },
 
     checkIfUserExist: () => {
@@ -53,31 +42,24 @@ export const authService = {
             throw new Error('Email and password are required');
         }
 
-        try {
-            // Initialize mock users
-            initializeMockUsers();
+        const response = await fetch('http://localhost:3000/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, contrasena, nombre, telefono, direccion })
+        });
 
-            // Check if user already exists
-            const existingUser = findUserByEmail(email);
-            if (existingUser) {
-                throw new Error('User already exists');
-            }
-
-            // Add new user to mock data
-            const newUser = addUser({ email, contrasena, nombre, telefono, direccion });
-
-            // Store user in localStorage (without password)
-            const userToStore = { ...newUser };
-            delete userToStore.contrasena;
-            localStorage.setItem('UCBuser', JSON.stringify(userToStore));
-
-            return {
-                message: 'User registered successfully',
-                user: userToStore
-            };
-        } catch (error) {
-            throw error;
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Unable to register');
         }
+
+        const result = await response.json();
+        const userToStore = result.user;
+        localStorage.setItem('UCBuser', JSON.stringify(userToStore));
+        return {
+            message: 'User registered successfully',
+            user: userToStore
+        };
     }
 };
 

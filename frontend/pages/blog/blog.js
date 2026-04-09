@@ -118,6 +118,16 @@ export class Blog extends HTMLElement {
             return;
         }
 
+        if (this.selectedTab === 'saved' && !this.user) {
+            articlesList.innerHTML = '<p>Debes iniciar sesión para ver los guardados.</p>';
+            return;
+        }
+
+        if (this.selectedTab === 'mine' && !this.user) {
+            articlesList.innerHTML = '<p>Debes iniciar sesión para ver tus blogs.</p>';
+            return;
+        }
+
         let filteredPosts = [];
         if (this.selectedTab === 'all') {
             filteredPosts = this.blogData;
