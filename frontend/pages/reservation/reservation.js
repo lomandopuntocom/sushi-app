@@ -1,3 +1,4 @@
+// reservation.js
 export class Reservation extends HTMLElement {
     constructor() {
         super();

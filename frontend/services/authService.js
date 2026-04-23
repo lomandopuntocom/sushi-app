@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export const authService = {
     login: async (email, contrasena) => {
         if (!contrasena || !email) {
@@ -64,3 +65,5 @@ export const authService = {
 };
 
 export default authService;
+=======
+>>>>>>> parent of 2910879 (implementacion inicio de sesion y CRUD de blogs)

@@ -14,6 +14,7 @@ const getPosts = async (req, res) => {
   }
 };
 
+<<<<<<< HEAD
 const savePost = async (req, res) => {
   try {
     const { idusuario, idpublicacion } = req.body;
@@ -45,6 +46,8 @@ const getSavedPosts = async (req, res) => {
   }
 };
 
+=======
+>>>>>>> parent of 2910879 (implementacion inicio de sesion y CRUD de blogs)
 const createPost = async (req, res) => {
   try {
     const { idusuario, nombre, autor, contenido, fecha } = req.body;
@@ -64,6 +67,4 @@ const createPost = async (req, res) => {
 module.exports = {
   getPosts,
   createPost,
-  savePost,
-  getSavedPosts
 };

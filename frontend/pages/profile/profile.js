@@ -1,5 +1,3 @@
-import authService from '../../services/authService.js';
-
 export class Profile extends HTMLElement {
     constructor() {
         super();
@@ -22,29 +20,25 @@ export class Profile extends HTMLElement {
                     <div class="profile-details">
                         <div class="detail-row">
                             <span class="label">Name:</span>
-                            <span class="value" id="profile-name"></span>
+                            <span class="value" id="profile-name">John Doe</span>
                         </div>
                         <div class="detail-row">
                             <span class="label">Email:</span>
-                            <span class="value" id="profile-email"></span>
+                            <span class="value" id="profile-email">john.doe@example.com</span>
                         </div>
                         <div class="detail-row">
                             <span class="label">Phone:</span>
-                            <span class="value" id="profile-phone"></span>
+                            <span class="value" id="profile-phone">+1 555-1234</span>
                         </div>
                         <div class="detail-row">
                             <span class="label">Address:</span>
-                            <span class="value" id="profile-address"></span>
+                            <span class="value" id="profile-address">123 Main St, Anytown, USA</span>
                         </div>
                         </div>
 
                     <div class="profile-actions">
                         <button class="edit-profile-button">Edit Profile</button>
-                    </div>
-
-                    <div class="profile-actions">
-                        <button id="close-profile-button" class="edit-profile-button">Close Profile</button>
-                    </div>
+                        </div>
 
                     <div class="footer-links">
                         <a href="#">Licensing</a>
@@ -57,16 +51,6 @@ export class Profile extends HTMLElement {
         this.shadowRoot.appendChild(template.content.cloneNode(true));
     }
 
-    fetchUserProfile() {
-        const user = authService.checkIfUserExist();
-        if (user) {
-            this.shadowRoot.getElementById('profile-name').textContent = user.nombre;
-            this.shadowRoot.getElementById('profile-email').textContent = user.email;
-            this.shadowRoot.getElementById('profile-phone').textContent = user.telefono;
-            this.shadowRoot.getElementById('profile-address').textContent = user.direccion;
-        }
-    }
-
     connectedCallback() {
         console.log('Profile component added to the DOM');
         const editButton = this.shadowRoot.querySelector('.edit-profile-button');
@@ -74,12 +58,7 @@ export class Profile extends HTMLElement {
             editButton.addEventListener('click', this.handleEditProfile.bind(this));
         }
 
-        const closeButton = this.shadowRoot.querySelector('#close-profile-button');
-        if (closeButton) {
-            closeButton.addEventListener('click', this.handleCloseProfile.bind(this));
-        }
-
-        this.fetchUserProfile();
+        this.loadUserProfile();
     }
 
     disconnectedCallback() {
@@ -88,16 +67,15 @@ export class Profile extends HTMLElement {
         if (editButton) {
             editButton.removeEventListener('click', this.handleEditProfile.bind(this));
         }
-
-        const closeButton = this.shadowRoot.querySelector('#close-profile-button');
-        if (closeButton) {
-            closeButton.removeEventListener('click', this.handleCloseProfile.bind(this));
-        }
     }
 
-    handleCloseProfile() {
-        authService.logout();
-        window.location.href = '/';
+    loadUserProfile() {
+        setTimeout(() => {
+            this.shadowRoot.getElementById('profile-name').textContent = 'Jane Smith';
+            this.shadowRoot.getElementById('profile-email').textContent = 'jane.smith@example.com';
+            this.shadowRoot.getElementById('profile-phone').textContent = '+44 20 7946 0870';
+            this.shadowRoot.getElementById('profile-address').textContent = '456 Oak Ave, Otherville, UK';
+        }, 500);
     }
 
     handleEditProfile() {
