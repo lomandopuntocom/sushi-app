@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '.env') });
 const express = require('express');
 const cors = require('cors');
 const menuRoutes = require('./routes/menuRoutes');
@@ -8,14 +9,9 @@ const reservationRoutes = require('./routes/reservationRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-if(process.env.ENV != "dev"){
-  app.use(cors({
-    origin: process.env.FRONTEND_URL, 
-    optionsSuccessStatus: 200 
-  }));
-}else{
-  app.use(cors());
-}
+const allowedOrigin = process.env.ENV !== 'dev' ? process.env.FRONTEND_URL : undefined;
+const corsOptions = allowedOrigin ? { origin: allowedOrigin, optionsSuccessStatus: 200 } : {};
+app.use(cors(corsOptions));
 app.use(express.json());
 
 app.get('/', (req, res) => {
