@@ -1,4 +1,6 @@
 const prisma = require('../prisma/client');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 
 const login = async (req, res) => {
   try {
@@ -13,7 +15,8 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
-    if (user.contrasena !== contrasena) {
+    const isMatch = await bcrypt.compare(contrasena, user.contrasena);
+    if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     res.json({ message: 'Login successful', user });
@@ -35,8 +38,9 @@ const logout = async (req, res) => {
 const registerUser = async (req, res) => {
   try {
     const { contrasena, nombre, telefono, email, direccion } = req.body;
+    const hashedPw = await bcrypt.hash(contrasena, saltRounds);
     const user = await prisma.usuario.create({
-      data: { contrasena, nombre, telefono, email, direccion }
+      data: { contrasena: hashedPw, nombre, telefono, email, direccion }
     });
     res.json({ message: 'User registered successfully', user });
   } catch (error) {
