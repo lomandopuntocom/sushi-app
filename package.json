@@ -1,0 +1,34 @@
+{
+  "name": "sushi-app",
+  "version": "1.0.0",
+  "description": "Este proyecto es una **aplicación web completa** para la gestión de un restaurante de sushi. Incluye un **frontend de tipo Single Page Application (SPA)** desarrollado con **Vanilla JavaScript** y **Web Components**, y un backend construido con **Node.js**, **Express** y **Prisma**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lomandopuntocom/sushi-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/lomandopuntocom/sushi-app/issues"
+  },
+  "homepage": "https://github.com/lomandopuntocom/sushi-app#readme",
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0"
+  },
+  "lint-staged": {
+  "frontend/src/**/*.{js,ts,jsx,tsx,json}": [
+    "npx --prefix frontend biome check --write --no-errors-on-unmatched"
+  ],
+  "backend/src/**/*.{js,ts,json}": [
+    "npx --prefix backend biome check --write --no-errors-on-unmatched"
+  ]
+}
+}

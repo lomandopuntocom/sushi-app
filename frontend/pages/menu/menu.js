@@ -1,3 +1,5 @@
+import menuService from '../../services/menuService.js';
+
 export class menu extends HTMLElement {
     constructor() {
         super();
@@ -35,19 +37,42 @@ export class menu extends HTMLElement {
     }
 
     async fetchMenuData() {
-    try {
-        const response = await fetch('http://localhost:3000/api/menu');
-        const data = await response.json();
+        this.renderSkeletons();
+        try {
+            const data = await menuService.getMenu();
 
-        this.menuData = data;
+            this.menuData = data;
 
-        this.renderCategories();
-        this.renderDishes(1);
-    } catch (error) {
-        console.error('Error al cargar los datos del menú:', error);
-        this.dishListContainer.innerHTML = '<p>Error al cargar los datos del menú.</p>';
+            setTimeout(() => {
+                this.renderCategories();
+                this.renderDishes(1);
+            }, 2000);
+        } catch (error) {
+            console.error('Error al cargar los datos del menú:', error);
+            this.dishListContainer.innerHTML = '<p>Error al cargar los datos del menú.</p>';
+        }
     }
-}
+
+    renderSkeletons() {
+        this.dishListContainer.innerHTML = '';
+        for (let i = 0; i < 6; i++) {
+            const skeletonCard = document.createElement('li');
+            skeletonCard.classList.add('skeleton-card');
+            skeletonCard.innerHTML = `
+                <div class="skeleton skeleton-thumbnail"></div>
+                <div class="skeleton-info">
+                    <div class="skeleton-header">
+                        <div class="skeleton skeleton-title"></div>
+                        <div class="skeleton skeleton-price"></div>
+                    </div>
+                    <div class="skeleton skeleton-body"></div>
+                    <div class="skeleton skeleton-body"></div>
+                    <div class="skeleton skeleton-actions"></div>
+                </div>
+            `;
+            this.dishListContainer.appendChild(skeletonCard);
+        }
+    }
 
 
     renderCategories() {
@@ -184,4 +209,6 @@ export class menu extends HTMLElement {
     }
 }
 
-customElements.define('menu-component', menu);
+if (!customElements.get('menu-component')) {
+    customElements.define('menu-component', menu);
+}

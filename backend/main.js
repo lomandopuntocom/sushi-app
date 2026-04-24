@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const menuRoutes = require('./routes/menuRoutes');
 const blogRoutes = require('./routes/blogRoutes');
+const authRoutes = require('./routes/authRoutes');
 const sessionRoutes = require('./routes/sessionRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 
@@ -18,12 +19,10 @@ app.get('/', (req, res) => {
   res.send('¡Sushi App!');
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/session', sessionRoutes);
-
 app.use('/api/menu', menuRoutes);
-
 app.use('/api/blog', blogRoutes);
-
 app.use('/api/reservation', reservationRoutes);
 
 app.listen(PORT, () => {
