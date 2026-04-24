@@ -1,5 +1,3 @@
-import authService from '../../services/authService.js';
-
 export class AddBlogPost extends HTMLElement {
     constructor() {
         super();
@@ -57,9 +55,7 @@ export class AddBlogPost extends HTMLElement {
         const author = this.shadowRoot.querySelector('#post-author').value;
         const content = this.shadowRoot.querySelector('#post-content').value;
 
-        const user = authService.checkIfUserExist();
         const newPost = {
-            idusuario: user ? user.id : 'anonymous',
             nombre: title,
             autor: author,
             contenido: content,

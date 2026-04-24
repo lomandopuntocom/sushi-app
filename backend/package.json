@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node main.js",
-    "dev": "nodemon main.js",
+    "dev": "node main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -18,8 +18,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "morgan": "^1.10.0",
-    "nodemon": "^3.1.14"
+    "morgan": "^1.10.0"
   },
   "devDependencies": {
     "prisma": "^6.19.3"

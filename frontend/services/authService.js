@@ -1,28 +1,27 @@
-<<<<<<< HEAD
 export const authService = {
     login: async (email, contrasena) => {
         if (!contrasena || !email) {
             throw new Error('Email and password are required');
         }
 
-        const response = await fetch('http://localhost:3000/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, contrasena })
-        });
+        try {
+            const response = await fetch('http://localhost:3000/api/session/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ contrasena, email })
+            });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Invalid credentials');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Login failed');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
         }
-
-        const result = await response.json();
-        const userToStore = result.user;
-        localStorage.setItem('UCBuser', JSON.stringify(userToStore));
-        return {
-            message: 'Login successful',
-            user: userToStore
-        };
     },
 
     checkIfUserExist: () => {
@@ -43,27 +42,25 @@ export const authService = {
             throw new Error('Email and password are required');
         }
 
-        const response = await fetch('http://localhost:3000/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, contrasena, nombre, telefono, direccion })
-        });
+        try {
+            const response = await fetch('http://localhost:3000/api/session/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ contrasena, email, nombre, telefono, direccion })
+            });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'Unable to register');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Registration failed');
+            }
+
+            return await response.json();
+        } catch (error) {
+            throw error;
         }
-
-        const result = await response.json();
-        const userToStore = result.user;
-        localStorage.setItem('UCBuser', JSON.stringify(userToStore));
-        return {
-            message: 'User registered successfully',
-            user: userToStore
-        };
     }
 };
 
 export default authService;
-=======
->>>>>>> parent of 2910879 (implementacion inicio de sesion y CRUD de blogs)

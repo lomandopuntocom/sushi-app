@@ -15,13 +15,10 @@ import { AddBlogPost } from './pages/addBlogPost/addBlogPost.js';
 
 // services
 import { Router } from './services/router.js';
-import { cartService } from './services/cartService.js';
 
 
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize cart service globally
-    console.log('CartService initialized');
     Router.init();
 });
